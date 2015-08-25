@@ -2,16 +2,25 @@ package eu.esens.adapter.minder.smp;
 
 import minderengine.Slot;
 import minderengine.Wrapper;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by melis on 17/08/15.
  */
-public abstract class SMPAdapter extends Wrapper{
+@SpringBootApplication
+public abstract class SMPAdapter extends Wrapper {
     static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(SMPAdapter.class.getName());
     private final String sutName;
     private final String smpServerAddress;
@@ -20,6 +29,8 @@ public abstract class SMPAdapter extends Wrapper{
      * A dummy status flag
      */
     private boolean isRunning = false;
+
+    private RestTemplate restTemplate;
 
     //Read wrapper specific properties from wrappper.properties file here
     public SMPAdapter() {
@@ -41,6 +52,9 @@ public abstract class SMPAdapter extends Wrapper{
 
             sutName = properties.getProperty("SUT_NAME");
             smpServerAddress = properties.getProperty("SMP_SERVER_URL");
+
+            restTemplate = new RestTemplate();
+
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -72,29 +86,33 @@ public abstract class SMPAdapter extends Wrapper{
     }
 
     //Define your signal and slots in here.
+
     /**
      * This method will be called in tests by Minder for receiving the service metadata
      * for a given business identifier, a service and docType
      * Returns all of the metadata about a Service, or a redirection URL to another Service Metadata Publisher holding
      * this information.
      *
-     * @param businessIdentifier
+     * @param identifierScheme
+     * @param id
+     * @param documentType
      */
     @Slot
-    public String getSignedServiceMetadata(String businessIdentifier, String serviceId, String docType) {
-        //Please check and change the input parameters. With which parameter do you query ?
-        //Determine the return variable. I just put and ordinary variable right now.
-        String foundMetadata = null;
+    public HashMap<String, List<String>> getSignedServiceMetadata(String identifierScheme, String id, String documentType) throws IOException {
         LOGGER.debug("getSignedServiceMetadata called");
-        //TODO Fill here
+        HashMap<String, List<String>> response;
 
-        //CALL The related service of SMP
+        LOGGER.debug("getServiceGroup called");
+        String theGetCommand = smpServerAddress + "/" + identifierScheme + "::"+id+"/services/"+documentType;
+        System.out.println("The prepared GET Command:"+theGetCommand);
 
-        //Wait for the response from SMP
+        ClientHttpRequest clientHttpRequest = restTemplate.getRequestFactory().createRequest(URI.create(theGetCommand), HttpMethod.GET);
+        ClientHttpResponse clientHttpResponse = clientHttpRequest.execute();
 
-        //Get the response from SMP
+        response = getResponseMessageAsHashMap(clientHttpResponse);
 
-        return foundMetadata;
+
+        return response;
 
     }
 
@@ -103,25 +121,56 @@ public abstract class SMPAdapter extends Wrapper{
      * for a given business identifier.
      * Returns the participant identifier of the recipient, and a list of references to individual ServiceMetadata
      * resources that are associated with that participant identifier.
-     * @param businessIdentifier
+     *
+     * @param identifierScheme
+     * @param id
      */
     @Slot
-    public List<String> getServiceGroup(String businessIdentifier) {
-        //Please check and change the input parameters. With which parameter do you query ?
-        //Determine the return variable. I just put and ordinary variable right now.
-        List<String> foundServices = null;
+    public HashMap<String, List<String>> getServiceGroup(String identifierScheme, String id) throws IOException {
+        HashMap<String, List<String>> response;
 
         LOGGER.debug("getServiceGroup called");
-        //TODO Fill Here
+        String theGetCommand = smpServerAddress + "/" + identifierScheme + "::"+id;
+        System.out.println("The prepared GET Command:"+theGetCommand);
 
-        //CALL The related service of SMP
+        ClientHttpRequest clientHttpRequest = restTemplate.getRequestFactory().createRequest(URI.create(theGetCommand), HttpMethod.GET);
+        ClientHttpResponse clientHttpResponse = clientHttpRequest.execute();
 
-        //Wait for the response from SMP
+        response = getResponseMessageAsHashMap(clientHttpResponse);
 
-        //Get the response from SMP
 
-        return foundServices;
+        return response;
 
+    }
+
+    protected HashMap<String, List<String>> getResponseMessageAsHashMap(ClientHttpResponse clientHttpResponse) throws IOException {
+        HashMap<String, List<String>> response = new HashMap<>();
+
+        //Response Code
+        System.out.println(clientHttpResponse.getRawStatusCode());
+        List<String> statusCode = new ArrayList<>();
+        statusCode.add(String.valueOf(clientHttpResponse.getRawStatusCode()));
+        response.put(Constants.HTTP_MESSAGE_STATUS, statusCode);
+
+        //Response Body
+        List<String> body = new ArrayList<>();
+        InputStream inputStream = clientHttpResponse.getBody();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = null;
+        while (null != (line = bufferedReader.readLine())) {
+            body.add(line);
+        }
+        response.put(Constants.HTTP_MESSAGE_BODY, body);
+
+        //Response Header
+        for (String key : clientHttpResponse.getHeaders().keySet()) {
+            List<String> values = clientHttpResponse.getHeaders().get(key);
+            response.put(key, values);
+            for (String value : values) {
+                System.out.println("Key=" + key + " Value=" + value);
+            }
+        }
+        return response;
     }
 
 
