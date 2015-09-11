@@ -15,12 +15,11 @@ public class SMPAdapterStartup {
     public static SMPAdapter wrapper;
 
     public static void main(String[] args) throws Exception {
+        PropertyConfigurator.configure(SMPAdapterStartup.class.getClassLoader().getResource("logging.properties"));
         LOGGER.info("Initializing the wrapper");
 
         //initialize the wrapper.
-        System.setProperty("propertyResource", "wrapper.properties");
-
-        PropertyConfigurator.configure(SMPAdapterStartup.class.getClassLoader().getResource("logging.properties"));
+        System.setProperty("propertyFile", "wrapper.properties");
 
         //Connects to MinderClient
         MinderClient minderClient = new MinderClient();

@@ -5,15 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>eu.esens.adapter.minder.smp</groupId>
-    <artifactId>SMPMinderAdapter</artifactId>
-    <version>2.0-SNAPSHOT</version>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.2.5.RELEASE</version>
-    </parent>
-
+    <artifactId>smp-minder-adapter</artifactId>
+    <version>2.0.1-beta</version>
     <build>
         <plugins>
             <plugin>
@@ -24,8 +17,36 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>standard-installer</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>eu.esens.adapter.minder.smp.SMPAdapterStartup</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
-        <finalName>SMPMinderAdapter</finalName>
     </build>
 
 
@@ -33,24 +54,17 @@
         <dependency>
             <groupId>gov.tubitak.minder</groupId>
             <artifactId>minder-common</artifactId>
-            <version>0.1.0</version>
+            <version>0.3.1</version>
         </dependency>
         <dependency>
             <groupId>gov.tubitak.minder</groupId>
             <artifactId>minder-client</artifactId>
-            <version>0.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <version>0.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <version>4.2.1.RELEASE</version>
         </dependency>
     </dependencies>
 </project>
