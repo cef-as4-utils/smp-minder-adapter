@@ -23,7 +23,6 @@ import java.util.*;
 public abstract class SMPAdapter extends Wrapper {
     static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(SMPAdapter.class.getName());
     private final String sutName;
-    private final String smpServerAddress;
 
     /**
      * A dummy status flag
@@ -51,7 +50,6 @@ public abstract class SMPAdapter extends Wrapper {
             is.close();
 
             sutName = properties.getProperty("SUT_NAME");
-            smpServerAddress = properties.getProperty("SMP_SERVER_URL");
 
             restTemplate = new RestTemplate();
 
@@ -98,12 +96,12 @@ public abstract class SMPAdapter extends Wrapper {
      * @param documentType
      */
     @Slot
-    public HashMap<String, List<String>> getSignedServiceMetadata(String identifierScheme, String id, String documentType) throws IOException {
+    public HashMap<String, List<String>> getSignedServiceMetadata(String serverAddress,String identifierScheme, String id, String documentType) throws IOException {
         LOGGER.debug("getSignedServiceMetadata called");
         HashMap<String, List<String>> response;
 
         LOGGER.debug("getServiceGroup called");
-        String theGetCommand = smpServerAddress + "/" + identifierScheme + "::"+id+"/services/"+documentType;
+        String theGetCommand = serverAddress + "/" + identifierScheme + "::"+id+"/services/"+documentType;
         System.out.println("The prepared GET Command:"+theGetCommand);
 
         ClientHttpRequest clientHttpRequest = restTemplate.getRequestFactory().createRequest(URI.create(theGetCommand), HttpMethod.GET);
@@ -126,11 +124,11 @@ public abstract class SMPAdapter extends Wrapper {
      * @param id
      */
     @Slot
-    public HashMap<String, List<String>> getServiceGroup(String identifierScheme, String id) throws IOException {
+    public HashMap<String, List<String>> getServiceGroup(String serverAddress,String identifierScheme, String id) throws IOException {
         HashMap<String, List<String>> response;
 
         LOGGER.debug("getServiceGroup called");
-        String theGetCommand = smpServerAddress + "/" + identifierScheme + "::"+id;
+        String theGetCommand = serverAddress + "/" + identifierScheme + "::"+id;
         System.out.println("The prepared GET Command:"+theGetCommand);
 
         ClientHttpRequest clientHttpRequest = restTemplate.getRequestFactory().createRequest(URI.create(theGetCommand), HttpMethod.GET);
