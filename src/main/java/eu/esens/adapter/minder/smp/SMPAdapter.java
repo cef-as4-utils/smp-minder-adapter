@@ -14,7 +14,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by melis on 17/08/15.
@@ -155,9 +158,11 @@ public abstract class SMPAdapter extends Wrapper {
         InputStream inputStream = clientHttpResponse.getBody();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
+        String xmlBodyString = "";
         while (null != (line = bufferedReader.readLine())) {
-            body.add(line);
+            xmlBodyString += line + "\n";
         }
+        body.add(xmlBodyString);
         response.put(Constants.HTTP_MESSAGE_BODY, body);
 
         //Response Header
