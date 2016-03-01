@@ -1,4 +1,4 @@
-package eu.esens.adapter.minder.smp;
+package minder.smp;
 
 /**
  * Created by melis on 19/08/15.

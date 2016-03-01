@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>eu.esens.adapter.minder.smp</groupId>
+    <groupId>minder</groupId>
     <artifactId>SMPMinderAdapter</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -24,6 +24,35 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>standard-installer</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>minder.smp.SMPAdapterStartup</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
         <finalName>SMPMinderAdapter</finalName>
     </build>
@@ -33,12 +62,12 @@
         <dependency>
             <groupId>gov.tubitak.minder</groupId>
             <artifactId>minder-common</artifactId>
-            <version>0.1.0</version>
+            <version>0.4.2</version>
         </dependency>
         <dependency>
             <groupId>gov.tubitak.minder</groupId>
             <artifactId>minder-client</artifactId>
-            <version>0.1.1</version>
+            <version>0.4.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -53,4 +82,14 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>eidrepo</id>
+            <url>http://eidrepo:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://eidrepo:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

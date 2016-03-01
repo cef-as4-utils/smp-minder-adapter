@@ -1,5 +1,7 @@
-package eu.esens.adapter.minder.smp;
+package minder.smp;
 
+import minderengine.SUTIdentifier;
+import minderengine.SUTIdentifiers;
 import minderengine.Slot;
 import minderengine.Wrapper;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +28,8 @@ import java.util.Properties;
 public abstract class SMPAdapter extends Wrapper {
     static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(SMPAdapter.class.getName());
     private final String sutName;
+    private SUTIdentifiers sutIdentifiers;
+
 
     /**
      * A dummy status flag
@@ -56,6 +60,11 @@ public abstract class SMPAdapter extends Wrapper {
 
             restTemplate = new RestTemplate();
 
+            sutIdentifiers = new SUTIdentifiers();
+            SUTIdentifier identifier = new SUTIdentifier();
+            identifier.setSutName("CIPA_SMP");
+            sutIdentifiers.getIdentifiers().add(identifier);
+
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -82,9 +91,10 @@ public abstract class SMPAdapter extends Wrapper {
     }
 
     @Override
-    public String getSUTName() {
-        return sutName;
+    public SUTIdentifiers getSUTIdentifiers() {
+        return sutIdentifiers;
     }
+
 
     //Define your signal and slots in here.
 
