@@ -4,7 +4,6 @@ import minderengine.SUTIdentifier;
 import minderengine.SUTIdentifiers;
 import minderengine.Slot;
 import minderengine.Wrapper;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -24,7 +23,6 @@ import java.util.Properties;
 /**
  * Created by melis on 17/08/15.
  */
-@SpringBootApplication
 public abstract class SMPAdapter extends Wrapper {
     static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(SMPAdapter.class.getName());
     private final String sutName;
